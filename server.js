@@ -8,7 +8,6 @@ const upload = multer({ dest: 'uploads/' });
 
 app.post('/runpython', upload.single('filetoupload'), (req, res) => {
     const filePath = req.file.path;
-    const fileName = path.basename(filePath);
 
     exec(`python -c "import main; main.pyMain('${filePath}')"`, (error, stdout, stderr) => {
         if (error) {
@@ -18,20 +17,20 @@ app.post('/runpython', upload.single('filetoupload'), (req, res) => {
         }
         console.log(`Python file output: ${stdout}`);
         console.error(`Python file errors: ${stderr}`);
-        res.send(`Python file output: ${stdout}`);
+
+        const csvFilePath = 'path/to/your/generated/csvfile.csv'; // Replace with the actual path to the generated CSV file
+        const csvFileName = 'generatedfile.csv'; // Replace with the desired filename for the downloaded file
+
+        res.download(csvFilePath, csvFileName, (err) => {
+            if (err) {
+                console.error(`Error downloading CSV file: ${err.message}`);
+                res.status(500).send(`Error downloading CSV file: ${err.message}`);
+            } else {
+                console.log('CSV file downloaded successfully');
+            }
+        });
     });
 });
-
-app.get('/download', (req, res) => {
-  const filePath = path.join(__dirname, 'path/to/your/file.csv');
-  const fileName = 'file.csv';
-
-  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-  res.setHeader('Content-Type', 'text/csv');
-
-  res.sendFile(filePath);
-});
-
 
 app.listen(3000, () => {
     console.log('Server started on port 3000');

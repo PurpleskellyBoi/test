@@ -22,6 +22,17 @@ app.post('/runpython', upload.single('filetoupload'), (req, res) => {
     });
 });
 
+app.get('/download', (req, res) => {
+  const filePath = path.join(__dirname, 'path/to/your/file.csv');
+  const fileName = 'file.csv';
+
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  res.setHeader('Content-Type', 'text/csv');
+
+  res.sendFile(filePath);
+});
+
+
 app.listen(3000, () => {
     console.log('Server started on port 3000');
 });
